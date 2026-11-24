@@ -46,7 +46,9 @@ jobs:
           workspaces: server
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: |
+          cd manglua-ls-vscode
+          bun install --frozen-lockfile
 
       - name: Build Rust Language Server
         run: cargo build --release --manifest-path manglua-ls/Cargo.toml
@@ -73,6 +75,7 @@ jobs:
 
       - name: Package VSIX
         run: |
+          cd manglua-ls-vscode
           bunx --no-install vsce package --target ${{ matrix.vsce_target }}
 
       - name: Upload VSIX
