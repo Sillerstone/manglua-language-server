@@ -58,8 +58,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p manglua-ls-vscode/server
-          cp manglua-ls/target/release/lsp-server manglua-ls-vscode/server
-          chmod +x manglua-ls-vscode/serverlsp-server
+          cp manglua-ls/target/release/manglua-ls manglua-ls-vscode/server
+          chmod +x manglua-ls-vscode/server/manglua-ls
           cp README.md manglua-ls-vscode
 
       - name: Copy Language Server and README.md (Windows)
@@ -67,7 +67,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force manglua-ls-vscode/server
-          Copy-Item manglua-ls/target/release/lsp-server.exe manglua-ls-vscode/server/lsp-server.exe
+          Copy-Item manglua-ls/target/release/manglua-ls.exe manglua-ls-vscode/server/manglua-ls.exe
           Copy-Item README.md manglua-ls-vscode/README.md
 
       - name: Build VS Code Extension
