@@ -1,8 +1,7 @@
 use tower_lsp_server::jsonrpc::Result;
-use tower_lsp_server::ls_types::{
-    InitializeParams, InitializeResult, InitializedParams, MessageType,
-};
+use tower_lsp_server::ls_types::{CompletionItem, CompletionOptions, CompletionParams, CompletionResponse, DidOpenTextDocumentParams, Hover, HoverContents, HoverParams, HoverProviderCapability, InitializeParams, InitializeResult, InitializedParams, MarkedString, MessageType, ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind};
 use tower_lsp_server::{Client, LanguageServer, LspService, Server};
+use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt};
 
 #[derive(Debug)]
@@ -12,13 +11,44 @@ struct Backend {
 
 impl LanguageServer for Backend {
     async fn initialize(&self, _: InitializeParams) -> Result<InitializeResult> {
-        Ok(InitializeResult::default())
+        Ok(InitializeResult {
+            capabilities: ServerCapabilities {
+                hover_provider: Some(HoverProviderCapability::Simple(true)),
+                text_document_sync: Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::INCREMENTAL)),
+                completion_provider: Some(CompletionOptions {
+                    resolve_provider: Some(false),
+                    trigger_characters: Some(vec![".".to_owned()]),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
     }
 
     async fn initialized(&self, _: InitializedParams) {
         self.client
             .log_message(MessageType::INFO, "server initialized")
             .await;
+    }
+
+    async fn did_open(&self, _: DidOpenTextDocumentParams) {
+        info!("did_open");
+    }
+
+    async fn completion(&self, _: CompletionParams) -> Result<Option<CompletionResponse>> {
+        info!("completion");
+        Ok(Some(CompletionResponse::Array(vec![
+            CompletionItem::new_simple("Hello".to_string(), "Some detail".to_string()),
+            CompletionItem::new_simple("Bye".to_string(), "More detail".to_string()),
+        ])))
+    }
+
+    async fn hover(&self, _: HoverParams) -> Result<Option<Hover>> {
+        Ok(Some(Hover {
+            contents: HoverContents::Scalar(MarkedString::String("You're hovering!".to_string())),
+            range: None,
+        }))
     }
 
     async fn shutdown(&self) -> Result<()> {
