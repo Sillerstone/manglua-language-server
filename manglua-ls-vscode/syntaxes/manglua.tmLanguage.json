@@ -3,12 +3,273 @@
   "scopeName": "source.manglua",
   "patterns": [
     {
+      "begin": "(?<=\\))\\s*(:)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.manglua"
+        }
+      },
+      "end": "(?=[\\n#])",
+      "patterns": [
+        {
+          "match": "\\b([A-Za-z_][A-Za-z0-9_.*<>\\[\\]]*)\\b",
+          "name": "support.type.manglua"
+        },
+        {
+          "include": "#emmydoc.type"
+        }
+      ]
+    },
+    {
+      "patterns": [
+        { "include": "#type-declarations" }
+      ],
+      "repository": {
+        "type-declarations": {
+          "patterns": [
+            { "include": "#interface-block" },
+            { "include": "#class-block" },
+            { "include": "#enum-block" }
+          ]
+        },
+        "interface-block": {
+          "name": "meta.interface.manglua",
+          "begin": "^[ \\t]*(interface)\\b\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.manglua" },
+            "2": { "name": "entity.name.type.interface.manglua" }
+          },
+          "end": "^[ \\t]*\\b(end)\\b",
+          "endCaptures": {
+            "1": { "name": "keyword.control.manglua" }
+          },
+          "patterns": [
+            { "include": "#comment" },
+            { "include": "#type-generics" },
+            { "include": "#type-inheritance" },
+            { "include": "#member-signature" },
+            { "include": "$self" }
+          ]
+        },
+        "class-block": {
+          "name": "meta.class.manglua",
+          "begin": "^[ \\t]*(class)\\b\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.manglua" },
+            "2": { "name": "entity.name.class.manglua" }
+          },
+          "end": "^[ \\t]*\\b(end)\\b",
+          "endCaptures": {
+            "1": { "name": "keyword.control.manglua" }
+          },
+          "patterns": [
+            { "include": "#comment" },
+            { "include": "#type-generics" },
+            { "include": "#type-inheritance" },
+            { "include": "#class-field-or-property" },
+            { "include": "$self" }
+          ]
+        },
+        "enum-block": {
+          "name": "meta.enum.manglua",
+          "begin": "^[ \\t]*(enum)\\b\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.manglua" },
+            "2": { "name": "entity.name.type.enum.manglua" }
+          },
+          "end": "^[ \\t]*\\b(end)\\b",
+          "endCaptures": {
+            "1": { "name": "keyword.control.manglua" }
+          },
+          "patterns": [
+            { "include": "#comment" },
+            {
+              "match": "\\b([A-Za-z_][A-Za-z0-9_]*)\\b(?:\\s*(=)\\s*([^,\\n]+))?(,)?",
+              "captures": {
+                "1": { "name": "constant.other.enum.manglua" },
+                "2": { "name": "keyword.operator.assignment.manglua" },
+                "3": { "name": "constant.numeric.manglua" },
+                "4": { "name": "punctuation.separator.comma.manglua" }
+              }
+            }
+          ]
+        },
+        "type-generics": {
+          "begin": "(<)",
+          "beginCaptures": {
+            "1": { "name": "punctuation.definition.typeparameters.begin.manglua" }
+          },
+          "end": "(>)",
+          "endCaptures": {
+            "1": { "name": "punctuation.definition.typeparameters.end.manglua" }
+          },
+          "patterns": [
+            {
+              "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b",
+              "name": "storage.type.generic.manglua"
+            },
+            {
+              "match": ",",
+              "name": "punctuation.separator.typeparameters.manglua"
+            }
+          ]
+        },
+        "type-inheritance": {
+          "match": "\\b(implements|extends)\\b\\s+([A-Za-z_][A-Za-z0-9_.,\\s]*?)(?=\\s*(?:<|--|$))",
+          "captures": {
+            "1": { "name": "keyword.control.manglua" },
+            "2": { "name": "entity.other.inherited-class.manglua" }
+          }
+        },
+        "class-field-or-property": {
+          "begin": "^[ \\t]*(?:(public|private|protected|property|static|readonly)\\s+)+([A-Za-z_][A-Za-z0-9_]*)\\s*(:)",
+          "beginCaptures": {
+            "1": { "name": "storage.modifier.manglua" },
+            "2": { "name": "variable.other.property.manglua" },
+            "3": { "name": "punctuation.separator.type.manglua" }
+          },
+          "end": "$",
+          "patterns": [
+            { "include": "#comment" },
+            {
+              "match": "=",
+              "name": "keyword.operator.assignment.manglua"
+            },
+            { "include": "#string" },
+            {
+              "match": "\\b\\d+(?:\\.\\d+)?\\b",
+              "name": "constant.numeric.manglua"
+            },
+            {
+              "match": "\\b[A-Za-z_][A-Za-z0-9_.<>\\[\\]]*\\b",
+              "name": "support.type.manglua"
+            }
+          ]
+        },
+        "member-signature": {
+          "name": "meta.function.manglua",
+          "begin": "^[ \\t]*(?:(public|private|protected|static|virtual|override|abstract)\\s+)*(function)\\b\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "beginCaptures": {
+            "1": { "name": "storage.modifier.manglua" },
+            "2": { "name": "keyword.control.manglua" },
+            "3": { "name": "entity.name.function.manglua" }
+          },
+          "end": "(?=[\\n#])",
+          "patterns": [
+            { "include": "#comment" },
+            {
+              "begin": "(\\()",
+              "beginCaptures": {
+                "1": { "name": "punctuation.definition.parameters.begin.manglua" }
+              },
+              "end": "(\\))",
+              "endCaptures": {
+                "1": { "name": "punctuation.definition.parameters.finish.manglua" }
+              },
+              "name": "meta.parameter.manglua",
+              "patterns": [
+                { "include": "#comment" },
+                {
+                  "match": "(\\.{3})\\s*([a-zA-Z_][a-zA-Z0-9_]*)",
+                  "captures": {
+                    "1": { "name": "constant.language.manglua" },
+                    "2": { "name": "variable.parameter.function.manglua" }
+                  }
+                },
+                {
+                  "match": "[a-zA-Z_][a-zA-Z0-9_]*",
+                  "name": "variable.parameter.function.manglua"
+                },
+                {
+                  "match": ",",
+                  "name": "punctuation.separator.arguments.manglua"
+                },
+                {
+                  "begin": ":",
+                  "beginCaptures": {
+                    "0": { "name": "punctuation.separator.arguments.manglua" }
+                  },
+                  "end": "(?=[\\),])",
+                  "patterns": [
+                    { "include": "#emmydoc.type" }
+                  ]
+                }
+              ]
+            },
+            {
+              "begin": "(?<=\\))\\s*(:)",
+              "beginCaptures": {
+                "1": { "name": "keyword.operator.manglua" }
+              },
+              "end": "(?=[\\n#])",
+              "patterns": [
+                { "include": "#emmydoc.type" }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "meta.namespace.manglua",
+      "begin": "^[ \\t]*(namespace)\\b\\s+([A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.namespace.manglua"
+        },
+        "2": {
+          "name": "entity.name.namespace.manglua"
+        }
+      },
+      "end": "^[ \\t]*\\b(end)\\b",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.manglua"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    {
+      "name": "meta.preprocessor.directive.manglua",
+      "begin": "^[ \\t]*(#)[ \\t]*(define|ifdef|endif|undef|ifndef|ifnot|if|elseif|elif|else|end)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.directive.manglua"
+        },
+        "2": {
+          "name": "keyword.control.directive.manglua"
+        }
+      },
+      "end": "(?<!\\\\)$",
+      "patterns": [
+        {
+          "match": "\\\\$",
+          "name": "punctuation.separator.continuation.manglua"
+        },
+        {
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b",
+          "name": "variable.other.macro.manglua"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "match": "\\b\\d+(?:\\.\\d+)?\\b",
+          "name": "constant.numeric.manglua"
+        }
+      ]
+    },
+    {
       "match": "\\b(give|import)\\s+(?:(\"[^\"]+\"|'[^']+')|([A-Za-z_][A-Za-z0-9_]*(?:[.\\/][A-Za-z0-9_]+)*))(?:\\s+(as)\\s+([A-Za-z_][A-Za-z0-9_]*))?",
       "name": "meta.import.manglua",
       "captures": {
         "1": { "name": "keyword.control.import.manglua" },
         "2": { "name": "string.quoted.manglua" },
-        "3": { "name": "entity.name.namespace.manglua" },
+        "3": { "name": "string.quoted.manglua" },
         "4": { "name": "keyword.control.import.manglua" },
         "5": { "name": "variable.other.alias.manglua" }
       }
@@ -81,16 +342,19 @@
       }
     },
     {
-      "begin": "\\b(?:(local)\\s+)?(function)\\b(?![,:])",
+      "begin": "\\b(?:(public|private|protected)\\s+)?(?:(local)\\s+)?(function)\\b(?![,:])",
       "beginCaptures": {
         "1": {
-          "name": "keyword.local.manglua"
+          "name": "keyword.control.manglua"
         },
         "2": {
+          "name": "keyword.local.manglua"
+        },
+        "3": {
           "name": "keyword.control.manglua"
         }
       },
-      "end": "(?<=[\\)\\-{}\\[\\]\"'])",
+      "end": "(?<=[\\)\\-{}\\[\\]\"'])|(?=[ \\t]*\\n)",
       "name": "meta.function.manglua",
       "patterns": [
         {
@@ -150,12 +414,118 @@
           ]
         },
         {
+          "begin": "(?<=\\))\\s*(:)",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.operator.manglua"
+            }
+          },
+          "end": "(?=[\\n#])",
+          "patterns": [
+            {
+              "include": "#emmydoc.type"
+            }
+          ]
+        },
+        {
           "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b\\s*(?=:)",
           "name": "entity.name.class.manglua"
         },
         {
           "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
           "name": "entity.name.function.manglua"
+        }
+      ]
+    },
+    {
+      "begin": "\\b(interface|class)\\b\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.manglua"
+        },
+        "2": {
+          "name": "entity.name.class.manglua"
+        }
+      },
+      "end": "\\b(end)\\b",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.manglua"
+        }
+      },
+      "name": "meta.type.declaration.manglua",
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "match": "<[^>]+>",
+          "name": "storage.type.generic.manglua"
+        },
+        {
+          "match": "\\b(implements|extends)\\b",
+          "name": "keyword.control.manglua"
+        },
+        {
+          "begin": "^[ \\t]*(?:(public|private|protected|property|static|readonly|override|virtual|final|abstract)\\s+)*([a-zA-Z_][a-zA-Z0-9_]*)\\s*(:)",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.control.manglua"
+            },
+            "2": {
+              "name": "entity.name.variable.manglua"
+            },
+            "3": {
+              "name": "keyword.operator.manglua"
+            }
+          },
+          "end": "(?=[\\n#])",
+          "patterns": [
+            {
+              "include": "#emmydoc.type"
+            },
+            {
+              "match": "=",
+              "name": "keyword.operator.manglua"
+            },
+            {
+              "include": "#string"
+            },
+            {
+              "match": "\\b\\d+(?:\\.\\d+)?\\b",
+              "name": "constant.numeric.manglua"
+            }
+          ]
+        },
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    {
+      "begin": "\\b(local)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(:)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.local.manglua"
+        },
+        "2": {
+          "name": "entity.name.variable.manglua"
+        },
+        "3": {
+          "name": "keyword.operator.manglua"
+        }
+      },
+      "end": "(?=[\\n#])",
+      "patterns": [
+        {
+          "include": "#emmydoc.type"
+        },
+        {
+          "match": "=",
+          "name": "keyword.operator.manglua"
+        },
+        {
+          "include": "$self"
         }
       ]
     },
@@ -262,7 +632,7 @@
       "name": "keyword.control.manglua"
     },
     {
-      "match": "\\b(class|public|private|protected|property|static|readonly|new|override|virtual|final|abstract|interface|implements|enum|as|give|import|namespace|extends)\\b",
+      "match": "\\b(class|public|private|protected|property|static|readonly|new|override|virtual|final|abstract|interface|implements|enum|as|namespace|extends)\\b",
       "name": "keyword.control.manglua"
     },
     {
@@ -328,22 +698,6 @@
     {
       "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*=\\s*\\b(function)\\b)",
       "name": "entity.name.function.manglua"
-    },
-    {
-      "name": "meta.preprocessor.directive.manglua",
-      "begin": "^\\s*(#)\\s*(define|ifdef|endif|undef|ifndef|ifnot|if|elseif|elif|else|end)\\s+?(.*)?\\s+?(.*)?\\b",
-      "beginCaptures": {
-        "1": {
-          "name": "punctuation.definition.directive.manglua"
-        }
-      },
-      "end": "(?<!\\\\)$",
-      "patterns": [
-        {
-          "match": "\\\\$",
-          "name": "punctuation.separator.continuation.manglua"
-        }
-      ]
     },
     {
       "match": "\\+|-|%|#|-=|\\+=|\\*=|..=|/=|//=|%=|^=|\\?\\?=|\\*|\\/|\\^|==?|~=|!=|<=?|>=?|(?<!\\.)\\.{2}(?!\\.)",
