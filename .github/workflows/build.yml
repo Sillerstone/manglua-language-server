@@ -71,7 +71,9 @@ jobs:
           Copy-Item README.md manglua-ls-vscode/README.md
 
       - name: Build VS Code Extension
-        run: bun run compile
+        run: |
+          cd manglua-ls-vscode
+          bun run compile
 
       - name: Package VSIX
         run: |
