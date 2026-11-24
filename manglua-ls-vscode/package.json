@@ -1,0 +1,60 @@
+{
+  "name": "manglua",
+  "description": "MangLua language support",
+  "author": "Votond",
+  "license": "MIT",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sillerstone/manglua-language-server"
+  },
+  "publisher": "Votond",
+  "categories": [
+    "Programming Languages"
+  ],
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "activationEvents": [
+    "onLanguage:manglua"
+  ],
+  "main": "./dist/extension.js",
+  "displayName": "MangLua",
+  "contributes": {
+    "languages": [
+      {
+        "id": "manglua",
+        "aliases": [
+          "MangLua",
+          "mlua"
+        ],
+        "extensions": [
+          ".mlua"
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "MangLua LS",
+      "properties": {
+        "mangLua.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to compiled LSP server binary. If empty, uses bundled or PATH binary."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc --noEmit && bun esbuild.js"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^11.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/vscode": "^1.100.0",
+    "@vscode/vsce": "^4.1.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
