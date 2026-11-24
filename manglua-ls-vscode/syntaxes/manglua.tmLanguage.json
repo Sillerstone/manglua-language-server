@@ -1,0 +1,1100 @@
+{
+  "name": "MangLua",
+  "scopeName": "source.manglua",
+  "patterns": [
+    {
+      "match": "\\b(give|import)\\s+(?:(\"[^\"]+\"|'[^']+')|([A-Za-z_][A-Za-z0-9_]*(?:[.\\/][A-Za-z0-9_]+)*))(?:\\s+(as)\\s+([A-Za-z_][A-Za-z0-9_]*))?",
+      "name": "meta.import.manglua",
+      "captures": {
+        "1": { "name": "keyword.control.import.manglua" },
+        "2": { "name": "string.quoted.manglua" },
+        "3": { "name": "entity.name.namespace.manglua" },
+        "4": { "name": "keyword.control.import.manglua" },
+        "5": { "name": "variable.other.alias.manglua" }
+      }
+    },
+    {
+      "name": "meta.attribute.manglua",
+      "begin": "(@\\[)\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.attribute.begin.manglua" },
+        "2": { "name": "entity.name.function.attribute.manglua" },
+        "3": { "name": "punctuation.section.parens.begin.manglua" }
+      },
+      "end": "(\\))\\s*(\\])",
+      "endCaptures": {
+        "1": { "name": "punctuation.section.parens.end.manglua" },
+        "2": { "name": "punctuation.definition.attribute.end.manglua" }
+      },
+      "patterns": [
+        { "include": "#attr-string" },
+        { "include": "#attr-number" },
+        { "include": "#attr-named-arg" },
+        { "include": "#attr-symbol-path" },
+        { "include": "#attr-punctuation" }
+      ],
+      "repository": {
+        "attr-string": {
+          "name": "string.quoted.double.manglua",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.manglua",
+              "match": "\\\\."
+            }
+          ]
+        },
+        "attr-number": {
+          "name": "constant.numeric.manglua",
+          "match": "\\b\\d+(?:\\.\\d+)?\\b"
+        },
+        "attr-named-arg": {
+          "match": "\\b([A-Za-z_][A-Za-z0-9_]*)\\s*(=)",
+          "captures": {
+            "1": { "name": "variable.parameter.attribute.manglua" },
+            "2": { "name": "keyword.operator.assignment.manglua" }
+          }
+        },
+        "attr-symbol-path": {
+          "match": "\\b([A-Za-z_][A-Za-z0-9_]*)(?:(::|\\.)([A-Za-z_][A-Za-z0-9_]*))*",
+          "captures": {
+            "1": { "name": "entity.name.type.manglua" }
+          }
+        },
+        "attr-punctuation": {
+          "patterns": [
+            {
+              "name": "punctuation.separator.comma.manglua",
+              "match": ","
+            },
+            {
+              "name": "punctuation.section.parens.begin.manglua",
+              "match": "\\("
+            },
+            {
+              "name": "punctuation.section.parens.end.manglua",
+              "match": "\\)"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "begin": "\\b(?:(local)\\s+)?(function)\\b(?![,:])",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.local.manglua"
+        },
+        "2": {
+          "name": "keyword.control.manglua"
+        }
+      },
+      "end": "(?<=[\\)\\-{}\\[\\]\"'])",
+      "name": "meta.function.manglua",
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "begin": "(\\()",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.parameters.begin.manglua"
+            }
+          },
+          "end": "(\\))|(?=[\\-{}\\[\\]\"'])|(?<!\\.)\\.(?!\\.)",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.parameters.finish.manglua"
+            }
+          },
+          "name": "meta.parameter.manglua",
+          "patterns": [
+            {
+              "include": "#comment"
+            },
+            {
+              "match": "(\\.{3})\\s*([a-zA-Z_][a-zA-Z0-9_]*)",
+              "captures": {
+                "1": {
+                  "name": "constant.language.manglua"
+                },
+                "2": {
+                  "name": "variable.parameter.function.manglua"
+                }
+              }
+            },
+            {
+              "match": "[a-zA-Z_][a-zA-Z0-9_]*",
+              "name": "variable.parameter.function.manglua"
+            },
+            {
+              "match": ",",
+              "name": "punctuation.separator.arguments.manglua"
+            },
+            {
+              "begin": ":",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.separator.arguments.manglua"
+                }
+              },
+              "end": "(?=[\\),])",
+              "patterns": [
+                {
+                  "include": "#emmydoc.type"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b\\s*(?=:)",
+          "name": "entity.name.class.manglua"
+        },
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+          "name": "entity.name.function.manglua"
+        }
+      ]
+    },
+    {
+      "match": "(?<![\\w\\d.])0[xX][0-9A-Fa-f]+(\\.[0-9A-Fa-f]*)?([eE]-?\\d*)?([pP][-+]\\d+)?",
+      "name": "constant.numeric.float.hexadecimal.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[xX]\\.[0-9A-Fa-f]+([eE]-?\\d*)?([pP][-+]\\d+)?",
+      "name": "constant.numeric.float.hexadecimal.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[xX][0-9A-Fa-f]+(?![pPeE.0-9])",
+      "name": "constant.numeric.integer.hexadecimal.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[oO][0-9A-Fa-f]+(\\.[0-9A-Fa-f]*)?([eE]-?\\d*)?([pP][-+]\\d+)?",
+      "name": "constant.numeric.float.octal.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[oO]\\.[0-9A-Fa-f]+([eE]-?\\d*)?([pP][-+]\\d+)?",
+      "name": "constant.numeric.float.octal.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[oO][0-9A-Fa-f]+(?![pPeE.0-9])",
+      "name": "constant.numeric.integer.octal.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[bB][0-9A-Fa-f]+(\\.[0-9A-Fa-f]*)?([eE]-?\\d*)?([pP][-+]\\d+)?",
+      "name": "constant.numeric.float.binary.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[bB]\\.[0-9A-Fa-f]+([eE]-?\\d*)?([pP][-+]\\d+)?",
+      "name": "constant.numeric.float.binary.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])0[bB][0-9A-Fa-f]+(?![pPeE.0-9])",
+      "name": "constant.numeric.integer.binary.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])\\d+(\\.\\d*)?([eE]-?\\d*)?",
+      "name": "constant.numeric.float.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])\\.\\d+([eE]-?\\d*)?",
+      "name": "constant.numeric.float.manglua"
+    },
+    {
+      "match": "(?<![\\w\\d.])\\d+(?![pPeE.0-9])",
+      "name": "constant.numeric.integer.manglua"
+    },
+    {
+      "include": "#string"
+    },
+    {
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.comment.manglua"
+        }
+      },
+      "match": "\\A(#!).*$\\n?",
+      "name": "comment.line.shebang.manglua"
+    },
+    {
+      "include": "#comment"
+    },
+    {
+      "captures": {
+        "1": {
+          "name": "keyword.control.goto.manglua"
+        },
+        "2": {
+          "name": "string.tag.manglua"
+        }
+      },
+      "match": "\\b(goto)\\s+([a-zA-Z_][a-zA-Z0-9_]*)"
+    },
+    {
+      "captures": {
+        "1": {
+          "name": "punctuation.section.embedded.begin.manglua"
+        },
+        "2": {
+          "name": "punctuation.section.embedded.end.manglua"
+        }
+      },
+      "match": "(::)\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*(::)",
+      "name": "string.tag.manglua"
+    },
+    {
+      "match": "<\\s*(const|close)\\s*>",
+      "captures": {
+        "0": {
+          "name": "storage.type.attribute.manglua"
+        }
+      }
+    },
+    {
+      "match": "\\<[a-zA-Z_\\*][a-zA-Z0-9_\\.\\*\\-]*\\>",
+      "name": "storage.type.generic.manglua"
+    },
+    {
+      "match": "\\b(break|continue|do|else|for|if|elseif|goto|return|then|repeat|while|until|end|in)\\b",
+      "name": "keyword.control.manglua"
+    },
+    {
+      "match": "\\b(class|public|private|protected|property|static|readonly|new|override|virtual|final|abstract|interface|implements|enum|as|give|import|namespace|extends)\\b",
+      "name": "keyword.control.manglua"
+    },
+    {
+      "match": "\\b(local)\\b",
+      "name": "keyword.local.manglua"
+    },
+    {
+      "match": "^\\s*(global)\\b(?!\\s*=)",
+      "captures": {
+        "1": {
+          "name": "keyword.global.manglua"
+        }
+      }
+    },
+    {
+      "match": "\\b(function)\\b(?![,:])",
+      "name": "keyword.control.manglua"
+    },
+    {
+      "match": "(?<![^.]\\.|:)\\b(false|nil(?!:)|true|_ENV|_G|_VERSION|DEFINE|math\\.(pi|huge|maxinteger|mininteger)|utf8\\.charpattern|io\\.(stdin|stdout|stderr)|package\\.(config|cpath|loaded|loaders|path|preload|searchers))\\b|(?<![.])\\.{3}(?!\\.)",
+      "name": "constant.language.manglua"
+    },
+    {
+      "match": "(?<![^.]\\.|:)\\b(self)\\b",
+      "name": "variable.language.self.manglua"
+    },
+    {
+      "match": "(?<![^.]\\.|:)\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|load|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawlen|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\\b(?!\\s*=(?!=))",
+      "name": "support.function.manglua"
+    },
+    {
+      "match": "(?<![^.]\\.|:)\\b(async)\\b(?!\\s*=(?!=))",
+      "name": "entity.name.tag.manglua"
+    },
+    {
+      "match": "(?<![^.]\\.|:)\\b(coroutine\\.(create|isyieldable|close|resume|running|status|wrap|yield)|string\\.(byte|char|dump|find|format|gmatch|gsub|len|lower|match|pack|packsize|rep|reverse|sub|unpack|upper)|table\\.(concat|create|insert|maxn|move|pack|remove|sort|unpack)|math\\.(abs|acos|asin|atan2?|ceil|cosh?|deg|exp|floor|fmod|frexp|ldexp|log|log10|max|min|modf|pow|rad|random|randomseed|sinh?|sqrt|tanh?|tointeger|type)|io\\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\\.(loadlib|seeall|searchpath)|debug\\.(debug|[gs]etfenv|[gs]ethook|getinfo|[gs]etlocal|[gs]etmetatable|getregistry|[gs]etupvalue|[gs]etuservalue|set[Cc]stacklimit|traceback|upvalueid|upvaluejoin)|bit32\\.(arshift|band|bnot|bor|btest|bxor|extract|replace|lrotate|lshift|rrotate|rshift)|utf8\\.(char|codes|codepoint|len|offset))\\b(?!\\s*=(?!=))",
+      "name": "support.function.library.manglua"
+    },
+    {
+      "match": "\\b(\\|\\||\\&\\&|\\!)\\b",
+      "name": "keyword.operator.manglua"
+    },
+    {
+      "match": "\\b(and|or|not)\\b",
+      "name": "keyword.operator.logical.manglua"
+    },
+    {
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*(?:[({\"']|\\[\\[))",
+      "name": "support.function.any-method.manglua"
+    },
+    {
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*\\??:)",
+      "name": "entity.name.class.manglua"
+    },
+    {
+      "match": "(?<=[^.]\\.|:)\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?!\\s*=\\s*\\b(function)\\b)",
+      "name": "entity.other.attribute.manglua"
+    },
+    {
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?!\\s*=\\s*\\b(function)\\b)",
+      "name": "variable.other.manglua"
+    },
+    {
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*=\\s*\\b(function)\\b)",
+      "name": "entity.name.function.manglua"
+    },
+    {
+      "name": "meta.preprocessor.directive.manglua",
+      "begin": "^\\s*(#)\\s*(define|ifdef|endif|undef|ifndef|ifnot|if|elseif|elif|else|end)\\s+?(.*)?\\s+?(.*)?\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.directive.manglua"
+        }
+      },
+      "end": "(?<!\\\\)$",
+      "patterns": [
+        {
+          "match": "\\\\$",
+          "name": "punctuation.separator.continuation.manglua"
+        }
+      ]
+    },
+    {
+      "match": "\\+|-|%|#|-=|\\+=|\\*=|..=|/=|//=|%=|^=|\\?\\?=|\\*|\\/|\\^|==?|~=|!=|<=?|>=?|(?<!\\.)\\.{2}(?!\\.)",
+      "name": "keyword.operator.manglua"
+    }
+  ],
+  "repository": {
+    "escaped_char": {
+      "patterns": [
+        {
+          "match": "\\\\[abfnrtv\\\\\"'\\n]",
+          "name": "constant.character.escape.manglua"
+        },
+        {
+          "match": "\\\\z[\\n\\t ]*",
+          "name": "constant.character.escape.manglua"
+        },
+        {
+          "match": "\\\\\\d{1,3}",
+          "name": "constant.character.escape.byte.manglua"
+        },
+        {
+          "match": "\\\\x[0-9A-Fa-f][0-9A-Fa-f]",
+          "name": "constant.character.escape.byte.manglua"
+        },
+        {
+          "match": "\\\\u\\{[0-9A-Fa-f]+\\}",
+          "name": "constant.character.escape.unicode.manglua"
+        },
+        {
+          "match": "\\\\.",
+          "name": "invalid.illegal.character.escape.manglua"
+        }
+      ]
+    },
+    "string": {
+      "patterns": [
+        {
+          "begin": "'",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.manglua"
+            }
+          },
+          "end": "'[ \\t]*|(?=\\n)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.manglua"
+            }
+          },
+          "name": "string.quoted.single.manglua",
+          "patterns": [
+            {
+              "include": "#escaped_char"
+            }
+          ]
+        },
+        {
+          "begin": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.manglua"
+            }
+          },
+          "end": "\"[ \\t]*|(?=\\n)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.manglua"
+            }
+          },
+          "name": "string.quoted.double.manglua",
+          "patterns": [
+            {
+              "include": "#escaped_char"
+            }
+          ]
+        },
+        {
+          "begin": "`",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.manglua"
+            }
+          },
+          "end": "`[ \\t]*|(?=\\n)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.manglua"
+            }
+          },
+          "name": "string.quoted.double.manglua"
+        },
+        {
+          "begin": "(?<=\\.cdef)\\s*(\\[(=*)\\[)",
+          "beginCaptures": {
+            "0": {
+              "name": "string.quoted.other.multiline.manglua"
+            },
+            "1": {
+              "name": "punctuation.definition.string.begin.manglua"
+            }
+          },
+          "contentName": "meta.embedded.manglua",
+          "end": "(\\]\\2\\])[ \\t]*",
+          "endCaptures": {
+            "0": {
+              "name": "string.quoted.other.multiline.manglua"
+            },
+            "1": {
+              "name": "punctuation.definition.string.end.manglua"
+            }
+          },
+          "patterns": [
+            {
+              "include": "source.c"
+            }
+          ]
+        },
+        {
+          "begin": "(?<!--)\\[(=*)\\[",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.manglua"
+            }
+          },
+          "end": "\\]\\1\\][ \\t]*",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.manglua"
+            }
+          },
+          "name": "string.quoted.other.multiline.manglua"
+        }
+      ]
+    },
+    "comment": {
+      "patterns": [
+        {
+          "begin": "(^[ \\t]+)?(?=--)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.manglua"
+            }
+          },
+          "end": "(?!\\G)((?!^)[ \\t]+\\n)?",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.trailing.manglua"
+            }
+          },
+          "patterns": [
+            {
+              "begin": "--\\[(=*)\\[@@@",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.begin.manglua"
+                }
+              },
+              "end": "(--)?\\]\\1\\]",
+              "endCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.end.manglua"
+                }
+              },
+              "name": "",
+              "patterns": [
+                {
+                  "include": "source.manglua"
+                }
+              ]
+            },
+            {
+              "begin": "--\\[(=*)\\[",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.begin.manglua"
+                }
+              },
+              "end": "(--)?\\]\\1\\]",
+              "endCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.end.manglua"
+                }
+              },
+              "name": "comment.block.manglua",
+              "patterns": [
+                {
+                  "include": "#emmydoc"
+                },
+                {
+                  "include": "#ldoc_tag"
+                }
+              ]
+            },
+            {
+              "begin": "----",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.manglua"
+                }
+              },
+              "end": "\\n",
+              "name": "comment.line.double-dash.manglua"
+            },
+            {
+              "begin": "---",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.manglua"
+                }
+              },
+              "end": "\\n",
+              "name": "comment.line.double-dash.documentation.manglua",
+              "patterns": [
+                {
+                  "include": "#emmydoc"
+                },
+                {
+                  "include": "#ldoc_tag"
+                }
+              ]
+            },
+            {
+              "begin": "--",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.manglua"
+                }
+              },
+              "end": "\\n",
+              "name": "comment.line.double-dash.manglua",
+              "patterns": [
+                {
+                  "include": "#ldoc_tag"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "begin": "\\/\\*",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.begin.manglua"
+            }
+          },
+          "end": "\\*\\/",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.end.manglua"
+            }
+          },
+          "name": "comment.block.manglua",
+          "patterns": [
+            {
+              "include": "#emmydoc"
+            },
+            {
+              "include": "#ldoc_tag"
+            }
+          ]
+        }
+      ]
+    },
+    "emmydoc": {
+      "patterns": [
+        {
+          "begin": "(?<=---)[ \\t]*@class",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "match": "\\b([a-zA-Z_\\*][a-zA-Z0-9_\\.\\*\\-]*)",
+              "name": "support.class.manglua"
+            },
+            {
+              "match": ":|,",
+              "name": "keyword.operator.manglua"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@enum",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "begin": "\\b([a-zA-Z_\\*][a-zA-Z0-9_\\.\\*\\-]*)",
+              "beginCaptures": {
+                "0": {
+                  "name": "variable.manglua"
+                }
+              },
+              "end": "(?=\\n)"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@type",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "include": "#emmydoc.type"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@alias",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "begin": "\\b([a-zA-Z_\\*][a-zA-Z0-9_\\.\\*\\-]*)",
+              "beginCaptures": {
+                "0": {
+                  "name": "variable.manglua"
+                }
+              },
+              "end": "(?=[\\n#])",
+              "patterns": [
+                {
+                  "include": "#emmydoc.type"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*(@operator)\\s*(\\b[a-z]+)?",
+          "beginCaptures": {
+            "1": {
+              "name": "storage.type.annotation.manglua"
+            },
+            "2": {
+              "name": "support.function.library.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "include": "#emmydoc.type"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@cast",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "begin": "\\b([a-zA-Z_\\*][a-zA-Z0-9_\\.\\*\\-]*)",
+              "beginCaptures": {
+                "0": {
+                  "name": "variable.other.manglua"
+                }
+              },
+              "end": "(?=\\n)",
+              "patterns": [
+                {
+                  "include": "#emmydoc.type"
+                },
+                {
+                  "match": "([+-|])",
+                  "name": "keyword.operator.manglua"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@param",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(\\??)",
+              "beginCaptures": {
+                "1": {
+                  "name": "entity.name.variable.manglua"
+                },
+                "2": {
+                  "name": "keyword.operator.manglua"
+                }
+              },
+              "end": "(?=[\\n#])",
+              "patterns": [
+                {
+                  "include": "#emmydoc.type"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@return",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "match": "\\?",
+              "name": "keyword.operator.manglua"
+            },
+            {
+              "include": "#emmydoc.type"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@field",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "begin": "(\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b|(\\[))(\\??)",
+              "beginCaptures": {
+                "2": {
+                  "name": "entity.name.variable.manglua"
+                },
+                "3": {
+                  "name": "keyword.operator.manglua"
+                }
+              },
+              "end": "(?=[\\n#])",
+              "patterns": [
+                {
+                  "include": "#string"
+                },
+                {
+                  "include": "#emmydoc.type"
+                },
+                {
+                  "match": "\\]",
+                  "name": "keyword.operator.manglua"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@generic",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+              "beginCaptures": {
+                "0": {
+                  "name": "storage.type.generic.manglua"
+                }
+              },
+              "end": "(?=\\n)|(,)",
+              "endCaptures": {
+                "0": {
+                  "name": "keyword.operator.manglua"
+                }
+              },
+              "patterns": [
+                {
+                  "match": ":",
+                  "name": "keyword.operator.manglua"
+                },
+                {
+                  "include": "#emmydoc.type"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@vararg",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "include": "#emmydoc.type"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@overload",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "include": "#emmydoc.type"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@deprecated",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])"
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@meta",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])"
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@private",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])"
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@protected",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])"
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@package",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])"
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@version",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "match": "\\b(5\\.1|5\\.2|5\\.3|5\\.4|JIT)\\b",
+              "name": "support.class.manglua"
+            },
+            {
+              "match": ",|\\>|\\<",
+              "name": "keyword.operator.manglua"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@see",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "match": "\\b([a-zA-Z_\\*][a-zA-Z0-9_\\.\\*\\-]*)",
+              "name": "support.class.manglua"
+            },
+            {
+              "match": "#",
+              "name": "keyword.operator.manglua"
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@diagnostic",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "begin": "([a-zA-Z_\\-0-9]+)[ \\t]*(:)?",
+              "beginCaptures": {
+                "1": {
+                  "name": "keyword.other.unit"
+                },
+                "2": {
+                  "name": "keyword.operator.unit"
+                }
+              },
+              "end": "(?=\\n)",
+              "patterns": [
+                {
+                  "match": "\\b([a-zA-Z_\\*][a-zA-Z0-9_\\-]*)",
+                  "name": "support.class.manglua"
+                },
+                {
+                  "match": ",",
+                  "name": "keyword.operator.manglua"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "begin": "(?<=---)[ \\t]*@module",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "include": "#string"
+            }
+          ]
+        },
+        {
+          "match": "(?<=---)[ \\t]*@(async|nodiscard)",
+          "name": "storage.type.annotation.manglua"
+        },
+        {
+          "begin": "(?<=---)\\|\\s*[\\>\\+]?",
+          "beginCaptures": {
+            "0": {
+              "name": "storage.type.annotation.manglua"
+            }
+          },
+          "end": "(?=[\\n@#])",
+          "patterns": [
+            {
+              "include": "#string"
+            }
+          ]
+        }
+      ]
+    },
+    "emmydoc.type": {
+      "patterns": [
+        {
+          "begin": "\\bfun\\b",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.control.manglua"
+            }
+          },
+          "end": "(?=[\\s#])",
+          "patterns": [
+            {
+              "match": "[\\(\\),\\:\\?\\[\\]\\<\\>][ \\t]*",
+              "name": "keyword.operator.manglua"
+            },
+            {
+              "match": "([a-zA-Z_][a-zA-Z0-9_\\.\\*\\-]*)(?<!,)[ \\t]*(?=\\??:)",
+              "name": "entity.name.variable.manglua"
+            },
+            {
+              "include": "#emmydoc.type"
+            },
+            {
+              "include": "#string"
+            }
+          ]
+        },
+        {
+          "match": "\\<[a-zA-Z_\\*][a-zA-Z0-9_\\.\\*\\-]*\\>",
+          "name": "storage.type.generic.manglua"
+        },
+        {
+          "match": "\\basync\\b",
+          "name": "entity.name.tag.manglua"
+        },
+        {
+          "match": "[\\{\\}\\:\\,\\?\\|\\`][ \\t]*",
+          "name": "keyword.operator.manglua"
+        },
+        {
+          "begin": "(?=[a-zA-Z_\\.\\*\"'\\[])",
+          "end": "(?=[\\s\\)\\,\\?\\:\\}\\|#])",
+          "patterns": [
+            {
+              "match": "([a-zA-Z0-9_\\.\\*\\[\\]\\<\\>\\,\\-]+)(?<!,)[ \\t]*",
+              "name": "support.type.manglua"
+            },
+            {
+              "match": "(\\.\\.\\.)[ \\t]*",
+              "name": "constant.language.manglua"
+            },
+            {
+              "include": "#string"
+            }
+          ]
+        }
+      ]
+    },
+    "ldoc_tag": {
+      "match": "\\G[ \\t]*(@)(alias|annotation|author|charset|class|classmod|comment|constructor|copyright|description|example|export|factory|field|file|fixme|function|include|lfunction|license|local|module|name|param|pragma|private|raise|release|return|script|section|see|set|static|submodule|summary|tfield|thread|tparam|treturn|todo|topic|type|usage|warning|within)\\b",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.block.tag.ldoc"
+        },
+        "2": {
+          "name": "storage.type.class.ldoc"
+        }
+      }
+    }
+  }
+}

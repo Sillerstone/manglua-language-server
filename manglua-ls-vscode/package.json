@@ -19,7 +19,6 @@
     "onLanguage:manglua"
   ],
   "main": "./dist/extension.js",
-  "displayName": "MangLua",
   "contributes": {
     "languages": [
       {
@@ -31,6 +30,13 @@
         "extensions": [
           ".mlua"
         ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "manglua",
+        "scopeName": "source.manglua",
+        "path": "./syntaxes/manglua.tmLanguage.json"
       }
     ],
     "configuration": {
