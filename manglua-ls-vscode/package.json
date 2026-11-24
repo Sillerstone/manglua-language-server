@@ -1,6 +1,8 @@
 {
   "name": "manglua",
+  "displayName": "MangLua",
   "description": "MangLua language support",
+  "icon": "resources/icon.png",
   "author": "Votond",
   "license": "MIT",
   "version": "0.1.0",
@@ -10,7 +12,9 @@
   },
   "publisher": "Votond",
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Linters",
+    "Snippets"
   ],
   "engines": {
     "vscode": "^1.100.0"

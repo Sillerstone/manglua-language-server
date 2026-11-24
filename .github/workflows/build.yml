@@ -1,0 +1,84 @@
+name: Build VSCode Extension
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.vsce_target }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: windows-latest
+            vsce_target: win32-x64
+
+          - os: macos-15-intel
+            vsce_target: darwin-x64
+
+          - os: ubuntu-latest
+            vsce_target: linux-x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: server
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Rust Language Server
+        run: cargo build --release --manifest-path manglua-ls/Cargo.toml
+
+      - name: Copy Language Server and README.md (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p manglua-ls-vscode/server
+          cp manglua-ls/target/release/lsp-server manglua-ls-vscode/server
+          chmod +x manglua-ls-vscode/serverlsp-server
+          cp README.md manglua-ls-vscode
+
+      - name: Copy Language Server and README.md (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force manglua-ls-vscode/server
+          Copy-Item manglua-ls/target/release/lsp-server.exe manglua-ls-vscode/server/lsp-server.exe
+          Copy-Item README.md manglua-ls-vscode/README.md
+
+      - name: Build VS Code Extension
+        run: bun run compile
+
+      - name: Package VSIX
+        run: |
+          bunx --no-install vsce package --target ${{ matrix.vsce_target }}
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-extension-${{ matrix.artifact }}
+          path: "*.vsix"
+          if-no-files-found: error
+          retention-days: 7
