@@ -8,8 +8,6 @@ import {
     TransportKind,
 } from "vscode-languageclient/node";
 
-const MANGLUA_EXTENSION = "mlua";
-
 let client: LanguageClient | undefined;
 
 function resolveServerCommand(context: vscode.ExtensionContext): string {
@@ -51,9 +49,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     };
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{scheme: "file", language: MANGLUA_EXTENSION}],
+        documentSelector: [{scheme: "file", language: "manglua"}],
         synchronize: {
-            fileEvents: vscode.workspace.createFileSystemWatcher(`**/*.${MANGLUA_EXTENSION}`),
+            fileEvents: vscode.workspace.createFileSystemWatcher("**/*.mlua"),
         },
     };
 
