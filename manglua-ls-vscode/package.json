@@ -33,7 +33,11 @@
         ],
         "extensions": [
           ".mlua"
-        ]
+        ],
+        "icon": {
+          "light": "./resources/file_icon.png",
+          "dark": "./resources/file_icon.png"
+        }
       }
     ],
     "grammars": [
